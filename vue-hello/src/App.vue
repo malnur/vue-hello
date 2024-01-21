@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 
 const message = ref('Hello Vue.js!')
@@ -20,7 +20,7 @@ const users = reactive([
   {
     name: 'User-2',
     age: 15,
-    books: 6
+    books: 10
   },
   {
     name: 'User-3',
@@ -29,7 +29,26 @@ const users = reactive([
   }
 ])
 
+function checkUser(user) {
+  return (user.books == 0 || user.books >= 10) ? 'error' : 'green'
+}
+
 const count = ref(0)
+const isLimit = computed(() => Math.abs(count.value) == 10)
+
+function counter(operation) {
+  if (count.value === 10 && operation === 'add') {
+    return
+  }
+  if (count.value === -10 && operation === 'sub') {
+    return
+  }
+  if (operation === 'add') {
+    count.value++
+  } else {
+    count.value--
+  }
+}
 </script>
 
 <template>
@@ -65,7 +84,7 @@ const count = ref(0)
       </ul>
       <hr />
       <ol>
-        <li v-for="(user, index) in users" :key="index" class="green">
+        <li v-for="(user, index) in users" :key="index" :class="checkUser(user)">
           {{ user.name }} has {{ user.books }} books
         </li>
       </ol>
@@ -74,9 +93,12 @@ const count = ref(0)
     <section>
       <h2>Event Handler</h2>
       <div>
-        <button @click="count++">Counter</button>
-        <button @click="count++">Counter</button>
+        <button @click="counter('add')">Increment</button>
+        <button @click="counter('sub')">Decrement</button>
         <span class="green">{{ count }}</span>
+      </div>
+      <div>
+        <p v-show="isLimit" class="error">Your limit has reached!</p>
       </div>
     </section>
   </main>
@@ -118,6 +140,12 @@ section button {
 
 section span {
   font-size: 1.5rem;
+}
+
+.error {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
 }
 
 @media (min-width: 1024px) {
